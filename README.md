@@ -1,2 +1,2 @@
 # pyDataSuite
-A graphical platform for analyzing and presenting data
+A graphical platform for professional data analysis and presentation
