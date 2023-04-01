@@ -24,19 +24,43 @@ class DataPage( ttk.Frame ):
         super().__init__( master )
 
         # Create treeview
-        self.treeview = ttk.Treeview( self, selectmode='browse' )
+        self.treeview = ttk.Treeview( self, selectmode='none' )
         self.treeview.grid( row=0, column=0, padx=10, pady=10, sticky="nsew" )
+        self.treeview.bind( "<Button-1>", self.treeselect )
+        self.treeselection = []
 
         # Set up treeview
-        # self.treeview.heading( "Dataset", text="Dataset" )
         self.treeview.heading( "#0", text="Datum", anchor="center" )
         populate_dataset_tree( self.treeview )
-
 
         # Set up grid
         self.grid_columnconfigure( 0, weight=1 )
         self.grid_rowconfigure( 0, weight=1 )
-        
+
+    def treeselect( self, event ):
+        """
+        Handle a click on the treeview.
+        """
+
+        # Get the selected item
+        item_name = self.treeview.identify_row( event.y )
+        if item_name:
+            tags = self.treeview.item( item_name, 'tags' )
+
+            # If dataset, toggle selecting it
+            if tags and ( tags[ 0 ] == "dataset" ):
+                if item_name in self.treeselection:
+                    self.treeselection.remove( item_name )
+                else:
+                    self.treeselection.append( item_name )
+                self.treeview.selection_set( self.treeselection )
+
+
+            # If group, toggle expanding or closing it
+            elif tags and ( tags[ 0 ] == "group" ):
+                is_open = self.treeview.item( item_name, "open")
+                self.treeview.item( item_name, open=not is_open )
+                    
 
 class ProjectPage( UI_Base ):
     """
@@ -88,3 +112,4 @@ class ProjectPage( UI_Base ):
         # Set up grid layout
         root_frame.grid_columnconfigure( 0, weight=1 )
         root_frame.grid_columnconfigure( 1, weight=1 )
+        root_frame.grid_rowconfigure( 1, weight=1 )
